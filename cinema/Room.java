@@ -1,7 +1,6 @@
 package cinema;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Room {
     private int columns;
@@ -9,10 +8,10 @@ public class Room {
     private ArrayList<Seat> seats;
 
     Room() {}
-    Room(int columns, int rows) {
+    Room(int rows, int columns) {
         this.columns = columns;
         this.rows = rows;
-        this.seats = getAvailableSeats(columns, rows);
+        this.seats = getAvailableSeats(rows, columns);
     }
 
     public int getRows() {
@@ -35,7 +34,7 @@ public class Room {
         return seats;
     }
 
-    public ArrayList<Seat> getAvailableSeats(int columns, int rows) {
+    public ArrayList<Seat> getAvailableSeats(int rows, int columns) {
         ArrayList<Seat> seats = new ArrayList<>();
         for (int row = 1; row <= rows; row++) {
             for (int column = 1; column <= columns; column++) {
@@ -43,5 +42,14 @@ public class Room {
             }
         }
         return seats;
+    }
+
+    public Seat getSeat(int row, int column) {
+        for (Seat seat : seats) {
+            if (seat.getRow() == row && seat.getColumn() == column) {
+                return seat;
+            }
+        }
+        return null;
     }
 }
