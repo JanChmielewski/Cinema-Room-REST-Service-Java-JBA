@@ -80,12 +80,54 @@ public class PurchaseController {
         } else {
             return errorResponse("Wrong token!", HttpStatus.BAD_REQUEST);
         }
+    }
 
+    @GetMapping("/stats")
+    public ResponseEntity<?> getStats(@RequestParam(value = "password", required = false) String password) {
+        String superSecretPassword = "super_secret";
+        if (password != null && password.equals(superSecretPassword)) {
+            int totalIncome = calculateTotalIncome();
+            int availableSeats = calculateAvailableSeats();
+            int purchasedSeats = calculatePurchasedSeats();
+
+            Map<String, Integer> stats = new LinkedHashMap<>();
+            stats.put("income", totalIncome);
+            stats.put("available", availableSeats);
+            stats.put("purchased", purchasedSeats);
+            return ResponseEntity.ok(stats);
+        } else {
+            return errorResponse("The password is wrong!", HttpStatus.UNAUTHORIZED);
+        }
     }
 
     private ResponseEntity<?> errorResponse(String errorMessage, HttpStatus status) {
         CustomError error = new CustomError(errorMessage);
         return ResponseEntity.status(status).body(error);
 
+    }
+
+    private int calculateTotalIncome() {
+        int totalIncome = 0;
+        for (Seat seat : ticketMap.values()) {
+            totalIncome += seat.getPrice();
+        }
+        return totalIncome;
+    }
+
+    private int calculateAvailableSeats() {
+        int availableSeats = 0;
+        for (int row = 1; row <= room.getRows(); row++) {
+            for (int column = 1; column <= room.getColumns(); column++) {
+                String seatKey = row + "-" + column;
+                if (!seatsMap.containsKey(seatKey)) {
+                    availableSeats++;
+                }
+            }
+        }
+        return availableSeats;
+    }
+
+    private int calculatePurchasedSeats() {
+        return ticketMap.size();
     }
 }
